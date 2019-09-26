@@ -16,33 +16,39 @@ function createWindow () {
     }
   })
 
-  let mainWindow2 = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      sandbox: true,
-      preload: path.join(__dirname, 'preload.js'),
-      affinity: "a"
-    }
-  })
+  let wins = [];
+  let numWins = 5
+  for (let i = 0; i < numWins; i++) {
+    let win = new BrowserWindow({
+      width: 800,
+      height: 600,
+      frame: false,
+      webPreferences: {
+        webSecurity: true,
+        nodeIntegration: false,
+        contextIsolation: false,
+        sandbox: true,
+        preload: path.join(__dirname, 'preload.js'),
+        affinity: "a"
+      }
+    })
 
-  let mainWindow3 = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      sandbox: true,
-      preload: path.join(__dirname, 'preload.js'),
-      affinity: "a"
+    win.loadFile('index.html')
+
+    if (i < numWins - 1) {
+      win.webContents.on('dom-ready', () => {
+        //win.close();
+        win.destroy();
+      });
     }
-  })
+  }
+
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
-  mainWindow2.loadFile('index.html')
-  mainWindow3.loadFile('index.html')
-
-  mainWindow.close()
-  mainWindow2.close()
+  mainWindow.webContents.on('dom-ready', () => {
+    mainWindow.close();
+  })
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
